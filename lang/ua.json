@@ -1,0 +1,18 @@
+{
+    "test_greeting": "Hello, world!",
+    "test_greeting_ua": "Привіт, світ!",
+    "main_page_title": "Морський бій",
+    "game_menu_game": "Гра",
+    "game_menu_status": "Статус",
+    "game_menu_datetime": "Дата",
+    "game_menu_type": "Тип",
+    "game_create_add": "Створити гру",
+    "game_create_cancel": "Відмінити",
+    "game_create_field_size": "Розмір поля",
+    "game_create_with_computer": "З компьютером",
+    "game_create_fill": "Заповнити",
+    "game_create_start": "Почати",
+    "game_create_error_out_of_boundaries": "Корабель виходить за межі ігрового поля",
+    "game_create_error_overlap": "Кораблі накладаються один на одного",
+    "game_create_error_not_ready": "Гра ще не готова до запуску"
+}

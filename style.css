@@ -1,0 +1,191 @@
+body {
+    font-family: Verdana;
+    font-size: 14pt;
+    display: flex;
+    justify-content: center;
+}
+
+.button {
+    padding: 10px 20px;
+    font: inherit;
+    cursor: pointer;
+    border: solid 3px #c6c6c6;
+    background: #EFEFEF;
+    transition: border-color .15s, background .15s;
+    border-radius: 12px;
+}
+
+.button:hover {
+    border-color: #d5d5d5;
+    background: #E6E6E6;
+}
+
+.button[disabled] {
+    cursor: default;
+    border-color: #ddd;
+    background: #ECECEC;
+    color: #999;
+}
+
+.own-range {
+    display: flex;
+    gap: 10px;
+}
+
+
+.seabattle-field {
+    display: grid;
+    width: 100%;
+    gap: 2px;
+    border-radius: 3%;
+    overflow: hidden;
+}
+
+.seabattle-field .seabattle-cell {
+    aspect-ratio: 1;
+    border-radius: 5%;
+    background: radial-gradient(#a1d3ff, #89c8ff);
+    transition: background .1s;
+}
+
+.seabattle-field .seabattle-cell.hidden-cell {
+    background: radial-gradient(#d2e1ea, #d3dbdf);
+}
+
+.seabattle-field .seabattle-cell.near-ship-cell {
+    background: radial-gradient(#a1d3ff, #acd9ff);
+}
+
+.seabattle-field .seabattle-cell.ship-cell {
+    background: radial-gradient(#939393, #9f9f9f);
+}
+
+.seabattle-field .seabattle-cell.damaged-ship-cell {
+    background: radial-gradient(#6a3700 0%, #512622 45%, #847878 65%);
+}
+
+.seabattle-field .seabattle-cell.error-cell {
+    background: radial-gradient(#ff4330, #df1400);
+}
+
+.seabattle-field-wrapper {
+    width: 330px;
+}
+
+.seabattle-field-contructor-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.seabattle-field-costships-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px 20px;
+    height: 100%;
+}
+
+.seabattle-field-costships-wrapper .ships-group {
+    cursor: pointer;
+    display: flex;
+    height: fit-content;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px;
+    align-items: center;
+    border: dashed 2px #EEE;
+    border-radius: 8px;
+    margin: 0 5px;
+}
+
+.seabattle-field-costships-wrapper .ship-icon {
+    display: inline-flex;
+    height: fit-content;
+    border-radius: 11px;
+    overflow: hidden;
+}
+
+.seabattle-field-costships-wrapper .ship-icon-block {
+    display: flex;
+    align-items: center;
+    aspect-ratio: 1;
+    width: 30px;
+    background: #9f9f9f;
+    border-radius: 4px;
+}
+
+.seabattle-field-costships-wrapper .ship-icon-block.text-block { 
+    justify-content: right;
+    padding-right: 3px;
+    font-size: 12pt;
+    background: none;
+}
+
+.seabattle-field-costerrors-wrapper {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    color: #a64040;
+}
+
+
+.gamelist-wrapper {
+    width: calc(500px + 40vw);
+    padding: 0;
+}
+
+.gamelist-controls-wrapper {
+    padding: 0 24px;
+}
+
+.gamelist-controls-wrapper .main-controls {
+    margin-bottom: 20px;
+}
+
+.gamelist-controls-wrapper .gamecreate-controls {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 550px;
+    transition: height .3s;
+}
+
+.gamelist-controls-wrapper .preview {
+    display: flex;
+    margin-top: 30px;
+}
+
+.gamelist-table-wrapper {
+    
+}
+
+table#gamelist {
+    text-align: center;
+    table-layout: fixed;
+    background: #EEE;
+    border-collapse: collapse;
+    border-radius: 16px;
+    overflow: hidden;
+    width: 100%;
+}
+
+table#gamelist thead {
+    background: #E0E0E0;
+}
+
+table#gamelist td {
+    padding: 12px 0;
+}
+
+table#gamelist tr {
+    border-bottom: solid 1px #EFEFEF;
+}
+
+table#gamelist tbody tr {
+    transition: background .2s;
+    cursor: pointer;
+}
+
+table#gamelist tbody tr:hover {
+    background: #F4F4F4;
+}
