@@ -46,6 +46,16 @@ body {
     border-radius: 5%;
     background: radial-gradient(#a1d3ff, #89c8ff);
     transition: background .1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(0, 40, 0, 0.55);
+    font-size: 20px;
+    cursor: default;
+}
+
+.seabattle-field .seabattle-cell.shot-crossmark::after {
+    content: "✖";
 }
 
 .seabattle-field .seabattle-cell.hidden-cell {
@@ -69,7 +79,7 @@ body {
 }
 
 .seabattle-field-wrapper {
-    width: 330px;
+    min-width: 330px;
 }
 
 .seabattle-field-contructor-wrapper {
@@ -159,6 +169,27 @@ body {
     
 }
 
+.gamelist-wrapper .ships-field-popup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.2);
+}
+
+.gamelist-wrapper .ships-field-popup .popup {
+    width: calc(50% + 200px);
+    height: auto;
+    overflow: hidden;
+    background: white;
+    padding: 50px;
+    border-radius: 70px;
+}
+
 table#gamelist {
     text-align: center;
     table-layout: fixed;
@@ -188,4 +219,18 @@ table#gamelist tbody tr {
 
 table#gamelist tbody tr:hover {
     background: #F4F4F4;
+}
+
+
+.game-wrapper {
+    width: 100%;
+}
+
+.game-wrapper .sections-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.game-wrapper .game-field-wrapper {
+    padding: 5vw;
 }

@@ -20,7 +20,9 @@ $lang_id = getPageLanguageID();
 $loc = new Localizer( loadLocal($lang_id) );
 
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-updateUserOnline($pdo, session_id(), $ip);
+$session_id = session_id();
+$game_id = getCurrentGameBySessID($pdo, $session_id);
+$game_status = getCurrentGameStatusBySessID($pdo, $session_id, $game_id);
 
 $js_requests = ['main'];
 $js_locals_required = [];
@@ -33,9 +35,15 @@ require_once HTML_BLOCKS_PTH . DIR_SEP . 'head.php';
 
 echo '<body>';
 
-//checkGameMap(10, [['size' => 4, 'position' => [2, 3], 'direction' => 1], ['size' => 1, 'position' => [2, 2], 'direction' => 1]]);
+//var_dump(checkGameMap(10, [['size' => 3, 'x' => 9, 'y' => 3, 'direction' => 0], ['size' => 3, 'x' => 9, 'y' => 7, 'direction' => 0]]));
+//var_dump(selectFullGameInfoById($pdo, 8, 8, true));
 
-require_once HTML_BLOCKS_PTH . DIR_SEP . 'game_menu.php';
+
+if ($game_id === -1 || $game_status !== 1) {
+    require_once HTML_BLOCKS_PTH . DIR_SEP . 'game_menu.php';
+} else {
+    require_once HTML_BLOCKS_PTH . DIR_SEP . 'game.php';
+}
 
 echo '<script>';
 echo 'const siteAPI = "' . $api_link . '";';
@@ -46,6 +54,9 @@ if ( count($js_locals_required) > 0) {
         echo $local . ':"' . $loc->l($local, false).'",';
     }
     echo '};';
+}
+if ($game_id !== -1) {
+    echo 'const game_id = ' . $game_id . ';';
 }
 echo '</script>';
 

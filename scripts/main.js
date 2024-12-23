@@ -128,5 +128,3 @@ function generateGameMap(ships, shoots) {
     
 }
 
-
-//data = await fetchData('https://api.example.com/data');

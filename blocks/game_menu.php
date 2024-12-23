@@ -1,10 +1,10 @@
 <?php
 array_push($js_requests, 'field', 'gamelist');
-array_push($js_locals_required, 'game_create_error_out_of_boundaries', 'game_create_error_overlap', 'game_create_error_not_ready');
+array_push($js_locals_required, 'game_create_error_out_of_boundaries', 'game_create_error_overlap', 'game_create_error_ships_not_placed', 'game_status_waiting', 'game_status_going');
 ?>
 
 <div class="gamelist-wrapper">
-    <div class="gamelist-controls-wrapper">
+    <div class="gamelist-controls-wrapper js-gamelist-controls-wrapper" style="display: none;">
         <div class="main-controls">
             <button 
                 class="button" 
@@ -40,16 +40,23 @@ array_push($js_locals_required, 'game_create_error_out_of_boundaries', 'game_cre
         <table id="gamelist">
             <thead>
                 <tr>
-                    <td><?php $loc->l("game_menu_game") ?></td>
-                    <td><?php $loc->l("game_menu_status") ?></td>
-                    <td><?php $loc->l("game_menu_datetime") ?></td>
-                    <td><?php $loc->l("game_menu_type") ?></td>
+                    <td style="width: 30%"><?php $loc->l("game_menu_game") ?></td>
+                    <td style="width: 10%"><?php $loc->l("game_menu_field_size") ?></td>
+                    <td style="width: 30%"><?php $loc->l("game_menu_status") ?></td>
+                    <td style="width: 20%"><?php $loc->l("game_menu_datetime") ?></td>
+                    <td style="width: 10%"><?php $loc->l("game_menu_type") ?></td>
                 </tr>
             </thead>
             <tbody>
-                
-                
             </tbody>
         </table>
+    </div>
+    <div class="ships-field-popup js-ships-field-popup" style="display: none;">
+        <div class="popup">
+            <div class="js-popup-field-wrapper" style="display: flex;"></div>
+            <button class="button" id="joingame" style="margin-top: 20px;">
+                <?php $loc->l("game_create_start") ?>
+            </button>
+        </div>
     </div>
 </div>

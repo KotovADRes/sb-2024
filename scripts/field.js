@@ -38,6 +38,7 @@ function createGameField(field_size, wrapper = null) {
                 
                 //-1 - hidden, 0 - sea, 1 - near-ship, 2 - ship, 3 - damaged ship
                 cell.sb.status = 0;
+                cell.sb.is_shot = false;
                 cell.sb.errors = new Set();
                 
                 cell.sb.updateCell = () => {
@@ -55,6 +56,12 @@ function createGameField(field_size, wrapper = null) {
                     } else if (stat > 0 && stat <= 3) {
                         cell.sb.setClassByIndex(stat);
                     }  
+                    
+                    if (cell.sb.is_shot) {
+                        cell.classList.add('shot-crossmark');
+                    } else {
+                        cell.classList.remove('shot-crossmark');
+                    }
                 }
                 
                 
@@ -64,6 +71,11 @@ function createGameField(field_size, wrapper = null) {
                     if(stat < 2 && cell.sb.getShip() !== null)
                         cell.sb.setShip(null);
                     
+                    cell.sb.updateCell();
+                }
+                
+                cell.sb.setShot = (shot) => {
+                    cell.sb.is_shot = Boolean(shot);
                     cell.sb.updateCell();
                 }
                 
@@ -216,7 +228,7 @@ function createGameField(field_size, wrapper = null) {
     }
     
     //{size: (1 ... field_size), x: (x), y: (y), direction: (0 ... 3: up, right, down, left)
-    field.sb.placeShip = (ship) => {
+    field.sb.placeShip = (ship, update = true) => {
         if (!(
         ship.hasOwnProperty('size')
         && ship.size > 0
@@ -256,7 +268,9 @@ function createGameField(field_size, wrapper = null) {
         }
         
         field.sb.ships.push(ship);
-        field.sb.updateShips();
+        
+        if (update)
+            field.sb.updateShips();
         
         return ship;
     }
@@ -270,10 +284,32 @@ function createGameField(field_size, wrapper = null) {
         field.sb.updateShips();
     }
     
+    field.sb.mapShots = (shots_map) => {
+        field.sb.cells.forEach(cell => {
+            const x = cell.sb.x;
+            const y = cell.sb.y;
+            
+            if (shots_map.length > x && shots_map[x].length > y) {
+                cell.sb.setShot(shots_map[x][y]);
+            }
+        });
+    }
+    
+    field.sb.mapCells = (status_map) => {
+        field.sb.cells.forEach(cell => {
+            const x = cell.sb.x;
+            const y = cell.sb.y;
+            
+            if (status_map.length > x && status_map[x].length > y) {
+                cell.sb.setStatus(status_map[x][y]);
+            }
+        });
+    }
+    
     if (wrapper instanceof Element) {
         wrapper.append(field);
-    } else {
-        return field;
-    }
+    } 
+    
+    return field;
     
 }

@@ -3,6 +3,7 @@
     "test_greeting_ua": "Привіт, світ!",
     "main_page_title": "Морський бій",
     "game_menu_game": "Гра",
+    "game_menu_field_size": "Розмір",
     "game_menu_status": "Статус",
     "game_menu_datetime": "Дата",
     "game_menu_type": "Тип",
@@ -14,5 +15,10 @@
     "game_create_start": "Почати",
     "game_create_error_out_of_boundaries": "Корабель виходить за межі ігрового поля",
     "game_create_error_overlap": "Кораблі накладаються один на одного",
-    "game_create_error_not_ready": "Гра ще не готова до запуску"
+    "game_create_error_ships_not_placed": "Не всі кораблі розташовано на полі",
+    "game_create_error_not_ready": "Гра ще не готова до запуску",
+    "game_status_waiting": "Чекає на гравця",
+    "game_status_going": "Іде",
+    "game_players_field": "Ви",
+    "game_enemys_field": "Опонент"
 }
