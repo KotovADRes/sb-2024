@@ -234,3 +234,54 @@ table#gamelist tbody tr:hover {
 .game-wrapper .game-field-wrapper {
     padding: 5vw;
 }
+
+.game-wrapper .game-field-wrapper .seabattle-field {
+    border: solid 5px #fff0;
+}
+
+.game-wrapper .game-field-wrapper .seabattle-field.current-turn {
+    border-color: #0003c6;
+}
+
+.game-wrapper .game-field-wrapper.game-enemy-side .seabattle-field .seabattle-cell {
+    cursor: pointer;
+}
+
+.game-wrapper .game-field-wrapper.game-enemy-side .seabattle-field.current-turn .seabattle-cell,
+.game-wrapper .game-field-wrapper.game-enemy-side .seabattle-field .seabattle-cell.shot-crossmark {
+    cursor: default;
+}
+
+.game-over-popup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+}
+
+.game-over-popup .game-over-title {
+    width: 100%;
+    font-size: 10vw;
+    color: white;
+    background: black;
+    text-align: center;
+    padding: 30px 0;
+    opacity: 0;
+    user-select: none;
+}
+
+@keyframes slideInFromTop {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

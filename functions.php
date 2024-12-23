@@ -504,10 +504,23 @@ function getFinalGameMap($shots_map, $ships, $fog = false) {
         }
         
         if ($fully_destroyed) {
-            $start_x = $ship['x'] - 1;
-            $start_y = $ship['y'] - 1;
-            $end_x = $ship['x'] + $x_coef * ($ship['size'] - 1) + 1;
-            $end_y = $ship['y'] + $y_coef * ($ship['size'] - 1) + 1;
+            $point_1 = ['x' => $ship['x'], 'y' => $ship['y']];
+            $point_2 = [
+                'x' => $ship['x'] + $x_coef * ($ship['size'] - 1), 
+                'y' => $ship['y'] + $y_coef * ($ship['size'] - 1)
+            ];
+            
+            $points = [];
+            if ($direction == 0 || $direction == 3) {
+                $points = [$point_2, $point_1];
+            } else {
+                $points = [$point_1, $point_2];
+            }
+            
+            $start_x = $points[0]['x'] - 1;
+            $start_y = $points[0]['y'] - 1;
+            $end_x = $points[1]['x'] + 1;
+            $end_y = $points[1]['y'] + 1;
             
             for ($x = $start_x; $x <= $end_x; $x++) {
                 for ($y = $start_y; $y <= $end_y; $y++) {
@@ -521,7 +534,7 @@ function getFinalGameMap($shots_map, $ships, $fog = false) {
     
     for ($y = 0; $y < $field_size; $y++) {
         for ($x = 0; $x < $field_size; $x++) {
-            if ( (int) $shots_map[$x][$y] === 1 && $matrix[$x][$y] === 2 ) {
+            if ( ((int) $shots_map[$x][$y]) === 1 && $matrix[$x][$y] === 2 ) {
                 $matrix[$x][$y] = 3;
             }
             if ( $fog && !$fog_matrix[$x][$y] ) {
@@ -551,8 +564,9 @@ function markDestroyedShips($pdo, $shots_map, $ships) {
         
         for ($s = 0; $s < (int) $ship['size']; $s++) {
             
-            if ((int) $shots_map[$x][$y] === 0) {
+            if (((int) $shots_map[$x][$y]) === 0) {
                 $destroyed = false;
+                break;
             }
             
             $x += $x_coef;
@@ -597,7 +611,7 @@ function enumeratePlayerInGame($player_id, &$game, &$player_ids, $user_id) {
         $player_ids[] = $player_id;
         $player_num = count($player_ids) - 1;
         
-        if ((int) $player_id === $user_id) {
+        if (((int) $player_id) === $user_id) {
             $game['is_users_game'] = true;
             $game['users_player_num'] = $player_num;
         }
@@ -647,7 +661,7 @@ function selectFullGameInfoById($pdo, $game_id, $user_id, $fog = false) {
     foreach($maps as $map) {
         $player_num = enumeratePlayerInGame($map['user_id'], $game, $player_ids, $user_id);
         
-        $curr_fog = $fog ? ((int) $map['user_id'] !== $user_id) : false;
+        $curr_fog = $fog ? (((int) $map['user_id']) !== $user_id) : false;
         $shots_map = json_decode($map['map'], JSON_UNESCAPED_UNICODE);
         
         $game['players'][$player_num]['should_update'] = (bool) $map['update_required'];
@@ -796,59 +810,76 @@ function getMapShipsCombinationByUserId($pdo, $game_id, $user_id) {
 }
 
 
+function checkIfAllShipsDestroyed($pdo, $game_id, $user_id) {
+    $ships_map = getMapShipsCombinationByUserId($pdo, $game_id, $user_id);
+    
+    if ($ships_map === false)
+        return false;
+        
+    $ships = $ships_map['ships'];
+    $map = $ships_map['map'];
+    
+    $marked_ships = markDestroyedShips($pdo, $map, $ships);
+    $all_ships_destroyed = true;
+    
+    foreach($marked_ships as $marked_ship) {
+        if ( !$marked_ship['is_destroyed'] ) {
+            $all_ships_destroyed = false;
+        }
+    }
+    
+    return $all_ships_destroyed;
+}
+
+
 function updateGameStatus($pdo, $game_id) {
-    $count = (int) getGamePlayersCount($pdo, $game_id);
-    if ($count < 0) {
+    $game = selectGameInfoById($pdo, $game_id);
+    if ($game === false) {
         return false;
     }
-    
-    $maps = getAllGameShotsMap($pdo, $game_id);
-    if ($maps === false) {
-        return false;
-    }
-    
-    $field_size = count($maps);
-    
-    $nobody_played = true;
+        
     $status = 2;
     
-    for ($x = 0; $x < $field_size; $x++) {
-        for ($y = 0; $y < $field_size; $y++) {
-            foreach ($maps as $map) {
-                if ((int) $map[$x][$y] === 1) {
-                    $nobody_played = false;
+    if ($game['winner_num'] === '-1') {
+        $count = (int) getGamePlayersCount($pdo, $game_id);
+        if ($count < 0) {
+            return false;
+        }
+        
+        $maps = getAllGameShotsMap($pdo, $game_id);
+        if ($maps === false) {
+            return false;
+        }
+        
+        $field_size = count($maps);
+        
+        $nobody_played = true;
+        
+        for ($x = 0; $x < $field_size; $x++) {
+            for ($y = 0; $y < $field_size; $y++) {
+                foreach ($maps as $map) {
+                    if (((int) $map[$x][$y]) === 1) {
+                        $nobody_played = false;
+                    }
                 }
             }
         }
-    }
-    
-    $users_id = getAllGameUserIds($pdo, $game_id);
-    $all_ships_destroyed = true;
-    
-    foreach($users_id as $user_id) {
-        $ship_map_comb = getMapShipsCombinationByUserId($pdo, $game_id, $user_id);
         
-        if ($ship_map_comb === false)
-            continue;
+        $users_id = getAllGameUserIds($pdo, $game_id);
+        $all_ships_destroyed = true;
         
-        $shots_map = $ship_map_comb['map'];
-        $ships = $ship_map_comb['ships'];
-        
-        $marked_ships = markDestroyedShips($pdo, $shots_map, $ships);
-        foreach($marked_ships as $marked_ship) {
-            if ( !$marked_ship['is_destroyed'] ) {
+        foreach($users_id as $user_id) {
+            if ( !checkIfAllShipsDestroyed($pdo, $game_id, $user_id) )
                 $all_ships_destroyed = false;
-            }
         }
-    }
-    
-    
-    if ($count === 1 && $nobody_played) {
-        $status = 0;
-    }
-    
-    if ($count === 2 && !$all_ships_destroyed) {
-        $status = 1;
+        
+        if ($count === 1 && $nobody_played) {
+            $status = 0;
+        }
+        
+        if ($count === 2 && !$all_ships_destroyed) {
+            $status = 1;
+        }
     }
     
     $stmt = $pdo->prepare("UPDATE `" . TABLE_GAMES . "` SET status = :status WHERE id = :game_id");
@@ -876,16 +907,47 @@ function getCurrentTurnUserIdByGameinfo($pdo, $game_info, $show_enemy = false) {
 }
 
 function getCurrentTurnUserId($pdo, $game_id, $show_enemy = false) {
-    $game = selectGameInfoById($pdo, $game_id, $show_enemy);
+    $game = selectGameInfoById($pdo, $game_id);
     
-    return getCurrentTurnUserIdByGameinfo($pdo, $game);
+    return getCurrentTurnUserIdByGameinfo($pdo, $game, $show_enemy);
+}
+
+function getWinnerIdByGameinfo($pdo, $game_info) {
+    $game_id = (int) $game_info['id'];
+    $users = getEnumeratedPlayers($pdo, $game_id);
+
+    $winner_num = (int) $game_info['winner_num'];
+    
+    if ( $winner_num == -1 || !isset($users[$winner_num]) )
+        return -1;
+    
+    return (int) $users[$winner_num];
+}
+
+function isExistsShipOnThisCell($pdo, $field_size, $ships, $x, $y) {
+    $matrix = getMatrix($field_size);
+    
+    foreach($ships as $ship) {
+        placeShipOnMatrix($matrix, $field_size, $ship);
+    }
+    
+    if (!isset($matrix[$x][$y]) || $matrix[$x][$y] != 2)
+        return false;
+    
+    return true;
 }
 
 
-function makeAMove($pdo, $game_id, $enemy_id, $enemy_num, $x, $y) {
-    $map = getGameShotsMapByUserId($pdo, $game_id, $enemy_id);
+function makeAMove($pdo, $game_id, $enemy_id, $next_player_num, $x, $y) {
+    $ships_map = getMapShipsCombinationByUserId($pdo, $game_id, $enemy_id);
     
-    if ((int) $map[$x][$y] === 1) {
+    if ($ships_map === false)
+        return false;
+    
+    $ships = $ships_map['ships'];
+    $map = $ships_map['map'];
+    
+    if (((int) $map[$x][$y]) === 1) {
         return false;
     }
     
@@ -898,14 +960,41 @@ function makeAMove($pdo, $game_id, $enemy_id, $enemy_num, $x, $y) {
         ':enemy_id' => $enemy_id
     ]);
     
-    $stmt = $pdo->prepare("UPDATE `" . TABLE_GAMES . "` SET player_num = :enemy_num, last_action = NOW() WHERE game_id = :game_id");
+    $hit_ship = isExistsShipOnThisCell($pdo, count($map), $ships, $x, $y);
+    
+    if ($hit_ship) {
+        $next_player_num = (1 - $next_player_num);
+        $player_won = checkIfAllShipsDestroyed($pdo, $game_id, $enemy_id);
+    }
+    
+    $sql_winner = '';
+    if ($player_won) {
+        $sql_winner = ', winner_num = ' . $next_player_num;
+    }
+    
+    
+    $stmt = $pdo->prepare("UPDATE `" . TABLE_GAME_MAP . "` SET update_required = 1 WHERE game_id = :game_id");
+    $stmt->execute([
+        ':game_id' => $game_id
+    ]);
+    
+    $stmt = $pdo->prepare("UPDATE `" . TABLE_GAMES . "` SET player_num = :player_num, last_action = NOW()" . $sql_winner . " WHERE id = :game_id");
     $stmt->execute([
         ':game_id' => $game_id,
-        ':enemy_num' => $enemy_num
+        ':player_num' => $next_player_num
     ]);
     
     return true;
     
+}
+
+
+function isAllPlayersUpdated($pdo, $game_id) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM `" . TABLE_GAME_MAP . "` WHERE game_id = :game_id AND update_required = 1");
+    $stmt->execute([':game_id' => $game_id]);
+    $count = $stmt->fetchColumn();
+    
+    return $count === '0';
 }
 
 ?>

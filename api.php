@@ -59,12 +59,19 @@ switch ($input_data['action']) {
         break;
     case 'get_current_game':
         $game_id = getCurrentGameBySessID($pdo, $session_id);
+        $response = ['in_game' => false];
 
         if ($game_id != -1) {
-            jsonResponse('success', '', ['in_game' => true, 'game_id' => $game_id]);
-        } else {
-            jsonResponse('success', '', ['in_game' => false]);
+            $status = getCurrentGameStatusBySessID($pdo, $session_id, $game_id);
+            
+            $response['in_game'] = true;
+            $response['game_id'] = $game_id;
+            if ($status != -1) {
+                $response['status'] = $status;
+            }
         }
+        
+        jsonResponse('success', '', $response);
         
     case 'get_ship_sets':
         jsonResponse('success', '', ['sets' => $SETS]);
@@ -216,7 +223,7 @@ switch ($input_data['action']) {
         jsonResponse('success', 'The user has joined the game');
         
         break;
-    case 'is_need_game_update':
+    case 'get_the_game_state':
         $game_id = getCurrentGameBySessID($pdo, $session_id);
 
         if ($game_id === -1) {
@@ -234,7 +241,27 @@ switch ($input_data['action']) {
             jsonResponse('error', 'User not found in game');
         }
         
-        jsonResponse('success', '', ['need_update' => (bool) $need_update]);
+        $game = selectGameInfoById($pdo, $game_id);
+        
+        $is_current_users_turn = getCurrentTurnUserIdByGameinfo($pdo, $game) === $user_id;
+        
+        $response = [
+            'need_update' => (bool) $need_update, 
+            'is_users_turn' => $is_current_users_turn
+        ];
+        
+        $winner_id = getWinnerIdByGameinfo($pdo, $game);
+        $is_someone_won = $winner_id !== -1;
+        
+        if ($is_someone_won) {
+            $response['game_over'] = true;
+            $response['user_won'] = $winner_id === $user_id;
+            if (((int) $game['status']) !== 2 && isAllPlayersUpdated($pdo, $game['id'])) {
+                updateGameStatus($pdo, $game_id);
+            }
+        }
+        
+        jsonResponse('success', '', $response);
         
         break;
     case 'im_updated':

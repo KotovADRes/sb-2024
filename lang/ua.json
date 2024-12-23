@@ -20,5 +20,8 @@
     "game_status_waiting": "Чекає на гравця",
     "game_status_going": "Іде",
     "game_players_field": "Ви",
-    "game_enemys_field": "Опонент"
+    "game_enemys_field": "Опонент",
+    "game_over_draw": "Нічия",
+    "game_over_win": "Ви перемогли!",
+    "game_over_defeat": "Ви програли."
 }

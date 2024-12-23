@@ -313,8 +313,7 @@ function get_ship_set (field_size) {
         field_size_range._Enable();
         ships_wrapper.sb.isDisabled(false);
         
-        gamelist.sb.getAndUpdateData();
-        checkAvailabilityOfGameCreation();
+        gamelist.sb.checkAllData();
     });
 })();
 
@@ -375,11 +374,12 @@ function getFieldPopup() {
     return [popup_wrapper, popup, start];
 }
 
-function addGametableFunctions(gamelist) {
+function addGametableFunctions(gamelist, controls) {
     const tbody = gamelist.querySelector('tbody');
     const fields = ['name', 'field_size', 'status', 'date', 'with_computer'];
     
     gamelist.sb = {};
+    controls.sb = {};
     
     gamelist.sb.getTr = (row) => {
         const tr = document.createElement('tr');
@@ -437,6 +437,30 @@ function addGametableFunctions(gamelist) {
         gamelist.sb.updateData(gamedata.games);
     };
     
+    gamelist.sb.checkGameStatus = async () => {
+        const game = await Request('get_current_game');
+        
+        if (!game)
+            return;
+        
+        const in_game = game.in_game;
+        const status = game.status;
+        
+        if ( in_game ) {
+            controls.style.display = 'none';
+            if (status === 1) {
+                location.reload();
+            }
+        } else {
+            controls.style.display = '';
+        }
+    };
+    
+    gamelist.sb.checkAllData = async () => {
+        await gamelist.sb.getAndUpdateData();
+        await gamelist.sb.checkGameStatus();
+    };
+    
     gamelist.sb.timer_id = null;
     
     gamelist.sb.deleteRequestInterval = () => {
@@ -460,33 +484,17 @@ function addGametableFunctions(gamelist) {
             )
                 return;
             
-            gamelist.sb.getAndUpdateData();
+            gamelist.sb.checkAllData();
         }, ms);
     }
     
-    gamelist.sb.getAndUpdateData();
+    gamelist.sb.checkAllData();
     
-    gamelist.sb.requestInterval(5000);
+    
+    gamelist.sb.requestInterval(2000);
     
 }
 
 const gamelist = document.querySelector('table#gamelist');
-addGametableFunctions(gamelist);
-
-async function checkAvailabilityOfGameCreation() {
-    const game = await Request('get_current_game');
-    const controls = document.querySelector('.js-gamelist-controls-wrapper');
-    
-    if (!game)
-        return;
-    
-    const in_game = game.in_game;
-    
-    if ( in_game ) {
-        controls.style.display = 'none';
-    } else {
-        controls.style.display = '';
-    }
-}
-
-checkAvailabilityOfGameCreation();
+const controls = document.querySelector('.js-gamelist-controls-wrapper');
+addGametableFunctions(gamelist, controls);
